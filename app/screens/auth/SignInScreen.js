@@ -1,31 +1,70 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
 import { auth } from '../../firebase/config';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/userSlice';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
-export default function SignInScreen({ navigation }) {
+const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
 
   const handleSignIn = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      dispatch(setUser(userCredential.user));
+      await signInWithEmailAndPassword(auth, email, password);
+      navigation.replace('Home');
     } catch (error) {
-      alert(error.message);
+      console.error(error);
     }
   };
 
   return (
-    <View>
-      <Text>Sign In</Text>
-      <TextInput placeholder="Email" onChangeText={setEmail} value={email} />
-      <TextInput placeholder="Password" secureTextEntry onChangeText={setPassword} value={password} />
+    <View style={styles.container}>
+      {/* Add the Logo Here */}
+      <Image source={require('../../assets/logo.png')} style={styles.logo} />
+      <Text style={styles.title}>Welcome to My App</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
       <Button title="Sign In" onPress={handleSignIn} />
-      <Button title="Don't have an account? Sign Up" onPress={() => navigation.navigate('SignUp')} />
+      <Button title="Go to Sign Up" onPress={() => navigation.navigate('SignUp')} />
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '80%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 5,
+  },
+});
+
+export default SignInScreen;
